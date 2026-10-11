@@ -1,0 +1,7 @@
+{
+  "uuid": "tailnet@itsmedista.github.io",
+  "name": "Tailnet",
+  "description": "Tailscale in Quick Settings: live status, exit nodes (including Mullvad), a searchable device list with direct/relay info, and health and key-expiry warnings.\n\nUnofficial, not affiliated with Tailscale Inc. Requires your user to be the Tailscale operator: sudo tailscale set --operator=$USER",
+  "shell-version": ["51"],
+  "version-name": "0.3"
+}

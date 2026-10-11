@@ -1,0 +1,22 @@
+.tailnet-peers {
+  max-height: 320px;
+}
+
+.tailnet-dot {
+  font-size: 10px;
+  color: #9a9996;
+  padding-right: 6px;
+}
+
+.tailnet-dot-online {
+  color: #33d17a;
+}
+
+.tailnet-detail {
+  font-size: smaller;
+  color: #9a9996;
+}
+
+.tailnet-button {
+  padding: 4px;
+}
