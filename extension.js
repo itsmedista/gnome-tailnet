@@ -18,7 +18,6 @@ import {
 } from './model.js';
 import {FilePicker, downloadsDir, receiveWaitingFiles} from './taildrop.js';
 
-const ICON = 'network-vpn-symbolic';
 const WARNING_ICON = 'dialog-warning-symbolic';
 const REFRESH_DEBOUNCE_MS = 250;
 
@@ -87,15 +86,18 @@ class ServiceItem extends RowItem {
 
 const TailnetToggle = GObject.registerClass(
 class TailnetToggle extends QuickMenuToggle {
-    constructor(api, {sendFiles, refresh}) {
-        super({title: 'Tailscale', iconName: ICON, toggleMode: false});
+    constructor(api, {icon, sendFiles, refresh}) {
+        super({title: 'Tailscale', gicon: icon, toggleMode: false});
+        this._icon = icon;
+        // GObjects may not be created at module load (extension review rule), so this lives here.
+        this._warningIcon = new Gio.ThemedIcon({name: WARNING_ICON});
         this._api = api;
         this._sendFiles = sendFiles;
         this._refresh = refresh;
         this._model = null;
         this._sharing = null;
 
-        this.menu.setHeader(ICON, 'Tailscale');
+        this.menu.setHeader(icon, 'Tailscale');
 
         this._warnings = new PopupMenu.PopupMenuSection();
         this.menu.addMenuItem(this._warnings);
@@ -237,8 +239,8 @@ class TailnetToggle extends QuickMenuToggle {
         this._model = model;
         this.checked = model.running;
         this.subtitle = model.subtitle;
-        this.iconName = model.running && model.warnings.length ? WARNING_ICON : ICON;
-        this.menu.setHeader(ICON, 'Tailscale', model.tailnet);
+        this.gicon = model.running && model.warnings.length ? this._warningIcon : this._icon;
+        this.menu.setHeader(this._icon, 'Tailscale', model.tailnet);
         this._loginItem.visible = model.needsLogin;
         this._accountMenu.visible = true;
         this._exitMenu.visible = true;
@@ -268,8 +270,8 @@ class TailnetToggle extends QuickMenuToggle {
         this._model = null;
         this.checked = false;
         this.subtitle = 'Unavailable';
-        this.iconName = ICON;
-        this.menu.setHeader(ICON, 'Tailscale', 'tailscaled is not reachable');
+        this.gicon = this._icon;
+        this.menu.setHeader(this._icon, 'Tailscale', 'tailscaled is not reachable');
         this._loginItem.visible = false;
         this._accountMenu.visible = false;
         this._exitMenu.visible = false;
@@ -349,10 +351,10 @@ class TailnetToggle extends QuickMenuToggle {
 
 const TailnetIndicator = GObject.registerClass(
 class TailnetIndicator extends SystemIndicator {
-    constructor() {
+    constructor(icon) {
         super();
         this._icon = this._addIndicator();
-        this._icon.icon_name = ICON;
+        this._icon.gicon = icon;
         this._icon.visible = false;
         this._refreshId = 0;
         this._watchFailing = false;
@@ -363,6 +365,7 @@ class TailnetIndicator extends SystemIndicator {
         this._api = new LocalApi();
         this._picker = new FilePicker();
         this._toggle = new TailnetToggle(this._api, {
+            icon,
             sendFiles: peer => this._sendFiles(peer),
             refresh: () => this._queueRefresh(),
         });
@@ -505,7 +508,7 @@ class TailnetIndicator extends SystemIndicator {
 
 export default class TailnetExtension extends Extension {
     enable() {
-        this._indicator = new TailnetIndicator();
+        this._indicator = new TailnetIndicator(Gio.FileIcon.new(this.dir.resolve_relative_path('icons/tailnet-symbolic.svg')));
         Main.panel.statusArea.quickSettings.addExternalIndicator(this._indicator);
     }
 

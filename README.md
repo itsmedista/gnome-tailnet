@@ -1,3 +1,5 @@
+<img src="assets/tailnet.svg" width="96" alt="">
+
 # Tailnet
 
 Tailscale in GNOME Shell's Quick Settings. Updates live from `tailscaled`'s event stream instead of polling.
