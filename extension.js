@@ -47,7 +47,7 @@ class RowItem extends PopupMenu.PopupBaseMenuItem {
         this.add_child(button);
     }
 
-    // ponytail: "copied" feedback stays until the next refresh rebuilds the row; no timer to clean up.
+    // The "copied" note stays until the next refresh rebuilds the row, so no timer is needed.
     copy(text, what) {
         if (!text)
             return;
@@ -355,6 +355,7 @@ class TailnetIndicator extends SystemIndicator {
         this._icon.icon_name = ICON;
         this._icon.visible = false;
         this._refreshId = 0;
+        this._watchFailing = false;
         this._receiving = false;
         this._receiveAgain = false;
         this._checkedWaitingFiles = false;
@@ -376,9 +377,10 @@ class TailnetIndicator extends SystemIndicator {
         this._refresh();
     }
 
-    // ponytail: every bus event triggers one debounced /status read instead of merging Notify deltas;
-    // simpler and always consistent. Ceiling: very large tailnets pay a full status read per event.
+    // Every bus event triggers one debounced /status read instead of applying Notify deltas: simpler and
+    // always consistent, at the cost of a full status read per event on very large tailnets.
     _onNotify(notify) {
+        this._watchFailing = false;
         if (notify.BrowseToURL && this._api.loginPending) {
             this._api.loginPending = false;
             Gio.AppInfo.launch_default_for_uri(notify.BrowseToURL, null);
@@ -447,7 +449,10 @@ class TailnetIndicator extends SystemIndicator {
     }
 
     _onWatchError(error) {
-        console.warn(`Tailnet: event stream failed, retrying: ${error.message}`);
+        // Retries every few seconds while tailscaled is down; log the outage once, not every retry.
+        if (!this._watchFailing)
+            console.warn(`Tailnet: lost tailscaled event stream, retrying: ${error.message}`);
+        this._watchFailing = true;
         this._queueRefresh();
     }
 
