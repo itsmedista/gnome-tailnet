@@ -1,10 +1,11 @@
 {
   "uuid": "tailnet@itsmedista.github.io",
   "name": "Tailnet",
-  "description": "Tailscale in Quick Settings, updated live from tailscaled.\n\n- Connect and disconnect, with health and key-expiry warnings\n- Searchable device list showing direct or relayed connections; copy IPs and MagicDNS names\n- Exit nodes, including suggested and Mullvad by country\n- Switch accounts and log in to custom servers such as Headscale\n- Taildrop: send files to devices, receive into Downloads\n- Share local services in your tailnet or publicly with Funnel\n\nClicking a device or shared service, or sharing a new one, copies its IP address, MagicDNS name or URL to the clipboard. Nothing is read from the clipboard.\n\nUnofficial, not affiliated with Tailscale Inc. Requires your user to be the Tailscale operator: sudo tailscale set --operator=$USER",
+  "description": "Tailscale in Quick Settings, updated live from tailscaled.\n\n* Connect and disconnect, with health and key-expiry warnings\n* Searchable device list showing direct or relayed connections; copy IPs and MagicDNS names\n* Exit nodes, including suggested and Mullvad by country\n* Switch accounts and log in to custom servers such as Headscale\n* Taildrop: send files to devices, receive into Downloads\n* Share local services in your tailnet or publicly with Funnel\n\nClicking a device or shared service, or sharing a new one, copies its IP address, MagicDNS name or URL to the clipboard. Nothing is read from the clipboard.\n\nUnofficial, not affiliated with Tailscale Inc. Requires your user to be the Tailscale operator: sudo tailscale set --operator=$USER",
   "shell-version": [
+    "50",
     "51"
   ],
-  "version-name": "0.3",
+  "version-name": "1.0",
   "url": "https://github.com/itsmedista/gnome-tailnet"
 }

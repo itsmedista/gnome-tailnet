@@ -89,7 +89,6 @@ class TailnetToggle extends QuickMenuToggle {
     constructor(api, {icon, sendFiles, refresh}) {
         super({title: 'Tailscale', gicon: icon, toggleMode: false});
         this._icon = icon;
-        // GObjects may not be created at module load (extension review rule), so this lives here.
         this._warningIcon = new Gio.ThemedIcon({name: WARNING_ICON});
         this._api = api;
         this._sendFiles = sendFiles;
@@ -347,6 +346,39 @@ class TailnetToggle extends QuickMenuToggle {
                 Main.notifyError('Tailscale', e.message);
         });
     }
+
+    // Innermost first, so nothing is destroyed twice by its parent.
+    destroy() {
+        this._search.destroy();
+        this._search = null;
+        this._serverEntry.destroy();
+        this._serverEntry = null;
+        this._targetEntry.destroy();
+        this._targetEntry = null;
+        this._accounts.destroy();
+        this._accounts = null;
+        this._services.destroy();
+        this._services = null;
+        this._httpsOffItem.destroy();
+        this._httpsOffItem = null;
+        this._sharePublicItem.destroy();
+        this._sharePublicItem = null;
+        this._shareForm.destroy();
+        this._shareForm = null;
+        this._warnings.destroy();
+        this._warnings = null;
+        this._loginItem.destroy();
+        this._loginItem = null;
+        this._peers.destroy();
+        this._peers = null;
+        this._accountMenu.destroy();
+        this._accountMenu = null;
+        this._exitMenu.destroy();
+        this._exitMenu = null;
+        this._sharingMenu.destroy();
+        this._sharingMenu = null;
+        super.destroy();
+    }
 });
 
 const TailnetIndicator = GObject.registerClass(
@@ -370,7 +402,7 @@ class TailnetIndicator extends SystemIndicator {
             refresh: () => this._queueRefresh(),
         });
         // Peer paths (direct/relay) change without bus events, so re-read whenever the menu opens.
-        this._toggle.menu.connect('open-state-changed', (_menu, open) => {
+        this._menuOpenId = this._toggle.menu.connect('open-state-changed', (_menu, open) => {
             if (open)
                 this._queueRefresh();
         });
@@ -499,6 +531,8 @@ class TailnetIndicator extends SystemIndicator {
         if (this._refreshId)
             GLib.source_remove(this._refreshId);
         this._refreshId = 0;
+        this._toggle.menu.disconnect(this._menuOpenId);
+        this._menuOpenId = 0;
         this._picker.destroy();
         this._api.destroy();
         this.quickSettingsItems.forEach(item => item.destroy());
